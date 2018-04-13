@@ -67,9 +67,7 @@ var (
   gauge run --tags "login" -s -p specs/`,
 		Run: func(cmd *cobra.Command, args []string) {
 			handleRepeatCommand(cmd, os.Args)
-			if e := env.LoadEnv(environment); e != nil {
-				logger.Fatalf(true, e.Error())
-			}
+			loadEnv()
 			if err := config.SetProjectRoot(args); err != nil {
 				exit(err, cmd.UsageString())
 			}
@@ -200,5 +198,13 @@ func writePrevCmd(cmdArgs []string) {
 	err = ioutil.WriteFile(prevCmdFile, []byte(contents), common.NewFilePermissions)
 	if err != nil {
 		logger.Fatalf(true, "Failed to write to %s. Reason: %s", prevCmdFile, err.Error())
+	}
+}
+
+func loadEnv() {
+	if !(repeat || failed) {
+		if e := env.LoadEnv(environment); e != nil {
+			logger.Fatalf(true, e.Error())
+		}
 	}
 }
